@@ -14,9 +14,8 @@ import (
 
 // Load fills config from file
 func Load(config interface{}) error {
-	r := reflect.ValueOf(config)
-	res := r.Elem()
-	fmt.Printf("res: %v\n", res)
+	res := reflect.ValueOf(config).Elem()
+
 	if config == nil {
 		return errors.New("No config specified")
 	}
