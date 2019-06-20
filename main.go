@@ -90,6 +90,9 @@ func setResult(res reflect.Value, config interface{}) {
 		rf := reflect.NewAt(f.Type(), unsafe.Pointer(f.UnsafeAddr())).Elem()
 		m := config.(map[interface{}]interface{})
 		k := res.Type().Field(i).Name
+		if _, ok := m[k]; !ok {
+			continue
+		}
 		rf.Set(reflect.ValueOf(m[k]))
 	}
 }
