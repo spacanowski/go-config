@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"unsafe"
 
 	"gopkg.in/yaml.v2"
@@ -20,7 +21,7 @@ func Load(config interface{}) error {
 		return errors.New("No config specified")
 	}
 
-	if err := loadConfigFile(&config, "application.yaml"); err != nil {
+	if err := loadConfigFile(&config, "application"); err != nil {
 		return err
 	}
 
@@ -32,7 +33,7 @@ func Load(config interface{}) error {
 		return nil
 	}
 
-	if err := loadConfigFile(&config, fmt.Sprintf("application-%s.yaml", profile)); err != nil {
+	if err := loadConfigFile(&config, fmt.Sprintf("application-%s", profile)); err != nil {
 		return err
 	}
 
@@ -41,11 +42,10 @@ func Load(config interface{}) error {
 	return nil
 }
 
-func loadConfigFile(config interface{}, fileName string) error {
-	if _, err := os.Stat(fileName); os.IsNotExist(err) {
-		log.Printf("No config for file %v\n", fileName)
-
-		return nil
+func loadConfigFile(config interface{}, baseFileName string) error {
+	fileName, err := getPropertyFileName(baseFileName)
+	if err != nil {
+		return err
 	}
 
 	configFile, err := ioutil.ReadFile(fileName)
@@ -66,16 +66,30 @@ func loadConfigFile(config interface{}, fileName string) error {
 	return nil
 }
 
+func getPropertyFileName(baseFileName string) (string, error) {
+	fileName := baseFileName + ".yaml"
+	if _, err := os.Stat(fileName); err == nil {
+		return fileName, nil
+	}
+
+	fileName = baseFileName + ".yml"
+	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+		log.Printf("No config for file %v\n", fileName)
+
+		return "", fmt.Errorf("No config for file %v", fileName)
+	}
+
+	return fileName, nil
+}
+
 func getProfile() string {
 	var result string
 
 	for i := 1; i < len(os.Args); i++ {
 		arg := os.Args[i]
 
-		if arg == "--profile" || arg == "-p" {
-			if len(os.Args) >= i+1 {
-				result = os.Args[i+1]
-			}
+		if strings.HasPrefix(arg, "--profile=") || strings.HasPrefix(arg, "-p=") {
+			result = strings.SplitAfter(arg, "=")[1]
 
 			break
 		}
