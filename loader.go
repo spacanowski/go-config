@@ -1,4 +1,4 @@
-package main
+package configloader
 
 import (
 	"errors"
@@ -33,7 +33,7 @@ func Load(config interface{}) error {
 		return nil
 	}
 
-	if err := loadConfigFile(&config, fmt.Sprintf("application-%s", profile)); err != nil {
+	if err := loadConfigFile(&config, "application-"+profile); err != nil {
 		return err
 	}
 
@@ -67,19 +67,24 @@ func loadConfigFile(config interface{}, baseFileName string) error {
 }
 
 func getPropertyFileName(baseFileName string) (string, error) {
-	fileName := baseFileName + ".yaml"
-	if _, err := os.Stat(fileName); err == nil {
-		return fileName, nil
+	for _, extension := range []string{".yaml", ".yml"} {
+		if fileName, ok := fileExists(baseFileName + extension); ok {
+			return fileName, nil
+		}
 	}
 
-	fileName = baseFileName + ".yml"
-	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+	return "", fmt.Errorf("No config for file %v with .yaml or .yml extension", baseFileName)
+}
+
+func fileExists(fileName string) (string, bool) {
+	_, err := os.Stat(fileName)
+
+	if os.IsNotExist(err) {
 		log.Printf("No config for file %v\n", fileName)
-
-		return "", fmt.Errorf("No config for file %v", fileName)
+		return fileName, false
 	}
 
-	return fileName, nil
+	return fileName, true
 }
 
 func getProfile() string {
@@ -99,14 +104,27 @@ func getProfile() string {
 }
 
 func setResult(res reflect.Value, config interface{}) {
+	valuesMap := config.(map[interface{}]interface{})
+
 	for i := 0; i < res.NumField(); i++ {
-		f := res.Field(i)
-		rf := reflect.NewAt(f.Type(), unsafe.Pointer(f.UnsafeAddr())).Elem()
-		m := config.(map[interface{}]interface{})
-		k := res.Type().Field(i).Name
-		if _, ok := m[k]; !ok {
+		fieldName := res.Type().Field(i).Name
+
+		if _, ok := valuesMap[fieldName]; !ok {
 			continue
 		}
-		rf.Set(reflect.ValueOf(m[k]))
+
+		field := res.Field(i)
+		reflectedField := reflect.NewAt(field.Type(), unsafe.Pointer(field.UnsafeAddr())).Elem()
+		v, isMap := valuesMap[fieldName].(map[interface{}]interface{})
+
+		if isMap {
+			if field.Kind() != reflect.Struct {
+				fmt.Printf("Cannot map. Field '%s' is not a struct\n", fieldName)
+				continue
+			}
+			setResult(reflectedField, v)
+		} else {
+			reflectedField.Set(reflect.ValueOf(valuesMap[fieldName]))
+		}
 	}
 }
