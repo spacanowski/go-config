@@ -124,7 +124,19 @@ func setResult(res reflect.Value, config interface{}) {
 			}
 			setResult(reflectedField, v)
 		} else {
-			reflectedField.Set(reflect.ValueOf(valuesMap[fieldName]))
+			value := reflect.ValueOf(valuesMap[fieldName])
+			if field.Kind() != value.Kind() {
+				fmt.Printf("Cannot map. Field '%s' is not of type '%s'\n", fieldName, value.Kind())
+				continue
+			}
+			if value.Kind() == reflect.Slice {
+				t := reflect.MakeSlice(field.Type(), value.Len(), value.Cap())
+				for i := 0; i < value.Len(); i++ {
+					t.Index(i).Set(reflect.ValueOf(value.Index(i).Interface()))
+				}
+				value = t
+			}
+			reflectedField.Set(value)
 		}
 	}
 }

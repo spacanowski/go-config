@@ -13,13 +13,19 @@ type internalConfig struct {
 			test2 bool
 			test3 string
 			empty string
+			test4 []int
+			test5 []string
 		}
 	}
 }
 
-type internalConfigWrong struct {
+type internalConfigWrongStructType struct {
 	test      string
 	internal1 string
+}
+
+type internalConfigWrongFieldType struct {
+	test int
 }
 
 func TestLoadProperties(t *testing.T) {
@@ -69,14 +75,14 @@ func TestLoadPropertiesWithoutProfile(t *testing.T) {
 	}
 }
 
-func TestShouldOmitWrongStructNameClash(t *testing.T) {
+func TestShouldOmitWrongStructType(t *testing.T) {
 	setup()
 	defer teardown()
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
 	os.Args = []string{"cmd", "--profile=dev"}
 
-	var config internalConfigWrong
+	var config internalConfigWrongStructType
 
 	if err := Load(&config); err != nil {
 		t.Fatalf("Properties loading failed %v", err)
@@ -88,6 +94,21 @@ func TestShouldOmitWrongStructNameClash(t *testing.T) {
 
 	if config.internal1 != "" {
 		t.Fatalf("internal1 failed, expected: ''  actual: %v", config.internal1)
+	}
+}
+
+func TestShouldOmitWrongFieldType(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var config internalConfigWrongFieldType
+
+	if err := Load(&config); err != nil {
+		t.Fatalf("Properties loading failed %v", err)
+	}
+
+	if config.test != 0 {
+		t.Fatalf("test failed, expected: 0  actual: %v", config.test)
 	}
 }
 
@@ -117,8 +138,16 @@ func fullTest(t *testing.T) {
 		t.Fatalf("test3 failed, expected: test4-ok  actual: %v", config.internal1.internal2.test3)
 	}
 
+	if len(config.internal1.internal2.test4) != 3 {
+		t.Fatalf("test4 failed, expected: 3 actual: %v", len(config.internal1.internal2.test4))
+	}
+
+	if len(config.internal1.internal2.test5) != 2 {
+		t.Fatalf("test5 failed, expected: 2 actual: %v", len(config.internal1.internal2.test5))
+	}
+
 	if config.internal1.internal2.empty != "" {
-		t.Fatalf("test4 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
+		t.Fatalf("test6 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
 	}
 }
 
@@ -132,7 +161,11 @@ internal1:
   test1: 1
   internal2:
     test2: true
-    test3: test4-ok`
+    test3: test4-ok
+    test4: [1,2,3]
+    test5:
+      - asd
+      - dsa`
 
 func setup() {
 	createTestFile(applicationYamlFileName, applicationYaml)
@@ -141,7 +174,7 @@ func setup() {
 
 func createTestFile(fileName string, fileContent string) {
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {
-		if f, cerr := os.Create(fileName); cerr == nil {
+		if f, err := os.Create(fileName); err == nil {
 			f.WriteString(fileContent)
 		}
 	}
