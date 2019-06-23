@@ -5,6 +5,10 @@ import (
 	"testing"
 )
 
+type innerStruct struct {
+	innerField string
+}
+
 type internalConfig struct {
 	test      string
 	internal1 struct {
@@ -16,6 +20,7 @@ type internalConfig struct {
 			test4 []int
 			test5 []string
 			test6 map[string]int
+			test7 []innerStruct
 		}
 	}
 }
@@ -163,8 +168,20 @@ func fullTest(t *testing.T) {
 		t.Fatalf("test6 failed, expected: 6 actual: %v", config.internal1.internal2.test6["key1"])
 	}
 
+	if len(config.internal1.internal2.test7) != 2 {
+		t.Fatalf("test7 failed, expected: 2 actual: %v", len(config.internal1.internal2.test7))
+	}
+
+	if config.internal1.internal2.test7[0].innerField != "in1" {
+		t.Fatalf("test7 failed, expected: 'in1' actual: %v", config.internal1.internal2.test7[0].innerField)
+	}
+
+	if config.internal1.internal2.test7[1].innerField != "in2" {
+		t.Fatalf("test7 failed, expected: 'in2' actual: %v", config.internal1.internal2.test7[1].innerField)
+	}
+
 	if config.internal1.internal2.empty != "" {
-		t.Fatalf("test7 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
+		t.Fatalf("test8 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
 	}
 }
 
@@ -185,7 +202,10 @@ internal1:
       - dsa
     test6:
       key1: 6
-      key2: 7`
+      key2: 7
+    test7:
+      - innerField: in1
+      - innerField: in2`
 
 func setup() {
 	createTestFile(applicationYamlFileName, applicationYaml)

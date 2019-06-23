@@ -119,27 +119,32 @@ func setResult(res reflect.Value, config interface{}) {
 
 		if isMap && field.Kind() == reflect.Struct {
 			setResult(reflectedField, v)
-		} else {
-			value := reflect.ValueOf(valuesMap[fieldName])
-			if field.Kind() != value.Kind() {
-				fmt.Printf("Cannot map. Field '%s' is not of type '%s'\n", fieldName, value.Kind())
-				continue
-			}
-			if value.Kind() == reflect.Slice {
-				t := reflect.MakeSlice(field.Type(), value.Len(), value.Cap())
-				for i := 0; i < value.Len(); i++ {
+			continue
+		}
+
+		value := reflect.ValueOf(valuesMap[fieldName])
+		if field.Kind() != value.Kind() {
+			fmt.Printf("Cannot map. Field '%s' is not of type '%s'\n", fieldName, value.Kind())
+			continue
+		}
+		if value.Kind() == reflect.Slice {
+			t := reflect.MakeSlice(field.Type(), value.Len(), value.Cap())
+			for i := 0; i < value.Len(); i++ {
+				if t.Index(i).Kind() == reflect.Struct {
+					setResult(t.Index(i), value.Index(i).Interface())
+				} else {
 					t.Index(i).Set(reflect.ValueOf(value.Index(i).Interface()))
 				}
-				value = t
-			} else if isMap {
-				t := reflect.MakeMap(field.Type())
-				iter := value.MapRange()
-				for iter.Next() {
-					t.SetMapIndex(reflect.ValueOf(iter.Key().Interface()), reflect.ValueOf(iter.Value().Interface()))
-				}
-				value = t
 			}
-			reflectedField.Set(value)
+			value = t
+		} else if isMap {
+			t := reflect.MakeMap(field.Type())
+			iter := value.MapRange()
+			for iter.Next() {
+				t.SetMapIndex(reflect.ValueOf(iter.Key().Interface()), reflect.ValueOf(iter.Value().Interface()))
+			}
+			value = t
 		}
+		reflectedField.Set(value)
 	}
 }
