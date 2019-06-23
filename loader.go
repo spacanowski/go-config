@@ -117,11 +117,7 @@ func setResult(res reflect.Value, config interface{}) {
 		reflectedField := reflect.NewAt(field.Type(), unsafe.Pointer(field.UnsafeAddr())).Elem()
 		v, isMap := valuesMap[fieldName].(map[interface{}]interface{})
 
-		if isMap {
-			if field.Kind() != reflect.Struct {
-				fmt.Printf("Cannot map. Field '%s' is not a struct\n", fieldName)
-				continue
-			}
+		if isMap && field.Kind() == reflect.Struct {
 			setResult(reflectedField, v)
 		} else {
 			value := reflect.ValueOf(valuesMap[fieldName])
@@ -133,6 +129,13 @@ func setResult(res reflect.Value, config interface{}) {
 				t := reflect.MakeSlice(field.Type(), value.Len(), value.Cap())
 				for i := 0; i < value.Len(); i++ {
 					t.Index(i).Set(reflect.ValueOf(value.Index(i).Interface()))
+				}
+				value = t
+			} else if isMap {
+				t := reflect.MakeMap(field.Type())
+				iter := value.MapRange()
+				for iter.Next() {
+					t.SetMapIndex(reflect.ValueOf(iter.Key().Interface()), reflect.ValueOf(iter.Value().Interface()))
 				}
 				value = t
 			}

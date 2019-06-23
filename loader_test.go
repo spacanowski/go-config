@@ -15,6 +15,7 @@ type internalConfig struct {
 			empty string
 			test4 []int
 			test5 []string
+			test6 map[string]int
 		}
 	}
 }
@@ -142,12 +143,28 @@ func fullTest(t *testing.T) {
 		t.Fatalf("test4 failed, expected: 3 actual: %v", len(config.internal1.internal2.test4))
 	}
 
+	if config.internal1.internal2.test4[1] != 2 {
+		t.Fatalf("test4 failed, expected: 2 actual: %v", config.internal1.internal2.test4[1])
+	}
+
 	if len(config.internal1.internal2.test5) != 2 {
 		t.Fatalf("test5 failed, expected: 2 actual: %v", len(config.internal1.internal2.test5))
 	}
 
+	if config.internal1.internal2.test5[1] != "dsa" {
+		t.Fatalf("test5 failed, expected: 'dsa' actual: %v", config.internal1.internal2.test5[1])
+	}
+
+	if len(config.internal1.internal2.test6) != 2 {
+		t.Fatalf("test6 failed, expected: 2 actual: %v", len(config.internal1.internal2.test6))
+	}
+
+	if config.internal1.internal2.test6["key1"] != 6 {
+		t.Fatalf("test6 failed, expected: 6 actual: %v", config.internal1.internal2.test6["key1"])
+	}
+
 	if config.internal1.internal2.empty != "" {
-		t.Fatalf("test6 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
+		t.Fatalf("test7 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
 	}
 }
 
@@ -165,7 +182,10 @@ internal1:
     test4: [1,2,3]
     test5:
       - asd
-      - dsa`
+      - dsa
+    test6:
+      key1: 6
+      key2: 7`
 
 func setup() {
 	createTestFile(applicationYamlFileName, applicationYaml)
