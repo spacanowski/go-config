@@ -141,7 +141,13 @@ func setResult(res reflect.Value, config interface{}) {
 			t := reflect.MakeMap(field.Type())
 			iter := value.MapRange()
 			for iter.Next() {
-				t.SetMapIndex(reflect.ValueOf(iter.Key().Interface()), reflect.ValueOf(iter.Value().Interface()))
+				if reflectedField.Type().Elem().Kind() == reflect.Struct {
+					str := reflect.New(reflectedField.Type().Elem()).Elem()
+					setResult(str, iter.Value().Interface())
+					t.SetMapIndex(reflect.ValueOf(iter.Key().Interface()), str)
+				} else {
+					t.SetMapIndex(reflect.ValueOf(iter.Key().Interface()), reflect.ValueOf(iter.Value().Interface()))
+				}
 			}
 			value = t
 		}

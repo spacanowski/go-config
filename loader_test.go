@@ -21,6 +21,7 @@ type internalConfig struct {
 			test5 []string
 			test6 map[string]int
 			test7 []innerStruct
+			test8 map[string]innerStruct
 		}
 	}
 }
@@ -180,8 +181,20 @@ func fullTest(t *testing.T) {
 		t.Fatalf("test7 failed, expected: 'in2' actual: %v", config.internal1.internal2.test7[1].innerField)
 	}
 
+	if len(config.internal1.internal2.test8) != 2 {
+		t.Fatalf("test8 failed, expected: 2 actual: %v", len(config.internal1.internal2.test8))
+	}
+
+	if config.internal1.internal2.test8["k1"].innerField != "i1" {
+		t.Fatalf("test8 failed, expected: 'i1' actual: %v", config.internal1.internal2.test8["k1"].innerField)
+	}
+
+	if config.internal1.internal2.test8["k2"].innerField != "i2" {
+		t.Fatalf("test8 failed, expected: 'i2' actual: %v", config.internal1.internal2.test8["k2"].innerField)
+	}
+
 	if config.internal1.internal2.empty != "" {
-		t.Fatalf("test8 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
+		t.Fatalf("test9 failed, expected: ''  actual: %v", config.internal1.internal2.empty)
 	}
 }
 
@@ -205,7 +218,12 @@ internal1:
       key2: 7
     test7:
       - innerField: in1
-      - innerField: in2`
+      - innerField: in2
+    test8:
+      k1:
+        innerField: i1
+      k2:
+        innerField: i2`
 
 func setup() {
 	createTestFile(applicationYamlFileName, applicationYaml)
