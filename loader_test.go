@@ -119,6 +119,20 @@ func TestShouldOmitWrongFieldType(t *testing.T) {
 	}
 }
 
+func TestShouldFailnknownProfile(t *testing.T) {
+	setup()
+	defer teardown()
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+	os.Args = []string{"cmd", "--profile=unknown"}
+
+	var config internalConfigWrongFieldType
+
+	if err := Load(&config); err == nil {
+		t.Fatalf("Load should fail for unknown profile")
+	}
+}
+
 func fullTest(t *testing.T) {
 	setup()
 	defer teardown()
