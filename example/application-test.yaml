@@ -1,0 +1,10 @@
+accountName: test-account
+aws:
+  regions: ['eu-west-1']
+  accountNumber: 321321
+  clientSqs:
+    client1: 'client1-q'
+    client2: 'client2-q'
+  db:
+    url: 'test.db.url'
+    username: test-db-user

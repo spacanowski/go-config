@@ -1,0 +1,14 @@
+test: ok
+test11: app
+appName: 'My app'
+accountName: dev-account
+aws:
+  regions: ['eu-west-1']
+  accountNumber: 123123
+  clientSqs:
+    client1: 'client1-q'
+    client2: 'client2-q'
+  db:
+    autoCommit: true
+    url: 'dev.db.url'
+    username: db-user

@@ -1,0 +1,11 @@
+accountName: prod-account
+aws:
+  regions: ['eu-west-1', 'eu-central-1']
+  accountNumber: 441441
+  clientSqs:
+    client1: 'client1-q'
+    client2: 'client2-q'
+    client3: 'client3-q'
+  db:
+    url: 'prod.db.url'
+    username: prod-db-user
