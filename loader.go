@@ -14,12 +14,18 @@ import (
 )
 
 // Load fills config from file
-func Load(config interface{}) error {
-	res := reflect.ValueOf(config).Elem()
+func Load(config interface{}) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("Config load failed: %v", r)
+		}
+	}()
 
 	if config == nil {
 		return errors.New("No config specified")
 	}
+
+	res := reflect.ValueOf(config).Elem()
 
 	if err := loadConfigFile(&config, "application"); err != nil {
 		return err
@@ -114,6 +120,7 @@ func setResult(res reflect.Value, config interface{}) {
 		}
 
 		field := res.Field(i)
+		// used unsafe to handle unexported fields
 		reflectedField := reflect.NewAt(field.Type(), unsafe.Pointer(field.UnsafeAddr())).Elem()
 		v, isMap := valuesMap[fieldName].(map[interface{}]interface{})
 
