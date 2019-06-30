@@ -2,6 +2,8 @@
 
 Config loader let's you load config from yaml file into your apps config structs based on profile.
 
+Inspired by Spring Boot profiles.
+
 ## How it works
 
 Config loader takes `application` yaml file (either `yaml` or `yml` extension) and maps it into coresponding struct. You could overwrite or define additional params in `application-<profile>.yml` files where `<profile>` is any profile name, e.g. `application-dev.yml`, `application-test.yml` or any other. Profile flag and files are optional. Profile name arg can be passed by program call param `--profile=<profile>` or `-p=<profile>` where `<profile>` is profile name coresponding to one defined in profile config file.
