@@ -10,7 +10,7 @@ If struct config value is not deffined in yaml file, then default type value is 
 
 ## Example usage
 
-See [full example]() or short one below. // TODO add repo with example
+See [full example](https://github.com/spacanowski/go-config/tree/master/example) or short one below.
 
 Define config struct
 
@@ -80,9 +80,11 @@ aws:
 ```
 
 Import loader and load config
-// TODO add import
 
 ```go
+
+import configloder https://github.com/spacanowski/go-config/loader
+
 func main() {
     var config myAppConfig
     if err := configloader.Load(&config); err != nil {

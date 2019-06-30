@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	configloader "../src"
+	configloader "https://github.com/spacanowski/go-config/loader"
 )
 
 type myAppConfig struct {
