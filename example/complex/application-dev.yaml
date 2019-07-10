@@ -1,0 +1,26 @@
+features:
+  feature1:
+    desc: 'some feautre 1'
+    featureID: 1
+    enabled: true
+  feature2:
+    desc: 'some feautre 2'
+    featureID: 2
+aws:
+  regions: ['eu-west-1', 'eu-west-2']
+  users:
+    - id: 1
+      login: 'user-1'
+    - id: 2
+      login: 'user2'
+    - id: 3
+      login: 'smth'
+  db:
+    url: 'some/rsd/url'
+    username: db-user
+  sqs:
+    clientQ:
+      client1: 'client1.q'
+      client2: 'client2.q'
+      client3: 'client3.q'
+      client4: 'client4.q'
