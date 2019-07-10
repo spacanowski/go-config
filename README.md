@@ -4,6 +4,12 @@ Config loader let's you load config from yaml file into your apps config structs
 
 Inspired by Spring Boot profiles.
 
+### Install
+
+```
+go get github.com/spacanowski/go-config/loader
+```
+
 ## How it works
 
 Config loader takes `application` yaml file (either `yaml` or `yml` extension) and maps it into coresponding struct. You could overwrite or define additional params in `application-<profile>.yml` files where `<profile>` is any profile name, e.g. `application-dev.yml`, `application-test.yml` or any other. Profile flag and files are optional. Profile name arg can be passed by program call param `--profile=<profile>` or `-p=<profile>` where `<profile>` is profile name coresponding to one defined in profile config file.
@@ -12,7 +18,7 @@ If struct config value is not deffined in yaml file, then default type value is 
 
 ## Example usage
 
-See [full example](https://github.com/spacanowski/go-config/tree/master/example) or short one below.
+See [full example](example) or short one below.
 
 Define config struct
 
