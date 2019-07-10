@@ -91,7 +91,9 @@ Import loader and load config
 
 ```go
 
-import configloder https://github.com/spacanowski/go-config/loader
+import (
+    configloder github.com/spacanowski/go-config/loader
+)
 
 func main() {
     var config myAppConfig
