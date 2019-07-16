@@ -2,6 +2,8 @@
 
 Config loader let's you load config from yaml file into your apps config structs based on profile.
 
+For Go v12+
+
 Inspired by Spring Boot profiles.
 
 ### Install
